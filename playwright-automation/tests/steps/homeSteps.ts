@@ -25,4 +25,7 @@ Then('user tap on {string} button from product detail page', async function (car
 Then('user verify checkout on cart page', async function () {
     await homePage.verifyCheckoutBtnOncartPage();   
     });
-    
+
+Then('user verify hamburger menu', async function () {
+    await homePage.verifyMenushomepage();   
+    });
