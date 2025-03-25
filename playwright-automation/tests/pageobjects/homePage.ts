@@ -13,6 +13,7 @@ export class HomePage {
         private readonly verifyProductAddToCartButton = '//button[@name="add-to-cart"]'
         private readonly verifyCartBtn = '//div[@class="shopping_cart_container"]'
         private readonly verifyCheckoutBtn = '//button[@name="checkout"]'
+        private readonly verifyHamburgerMenu = '//div[@class="bm-burger-buttontest"]'
 
 
     async verifyHomePage(username) {
@@ -44,5 +45,10 @@ export class HomePage {
     async verifyCheckoutBtnOncartPage(){
         await expect(pageFixture.page.locator(this.verifyCheckoutBtn)).toBeVisible({timeout : TIMEOUT});
         console.log("Verified checkout button on cart page")
+    }
+
+    async verifyMenushomepage(){
+        await expect(pageFixture.page.locator(this.verifyHamburgerMenu)).toBeVisible({timeout : TIMEOUT});
+        console.log("Verified Hamburger Menu")
     }
 }
