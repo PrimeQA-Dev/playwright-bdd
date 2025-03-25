@@ -1,22 +1,29 @@
-import { BeforeAll, AfterAll, Before, After, Status } from '@cucumber/cucumber';
-import { Browser, BrowserContext, chromium } from '@playwright/test';
-import { pageFixture } from './pageFixture';
+import { BeforeAll, AfterAll, Before, After, Status } from "@cucumber/cucumber";
+import { Browser, BrowserContext, chromium } from "@playwright/test";
+import { pageFixture } from "./pageFixture";
 import { sendEmail } from "../utils/emailSender";
 import * as fs from "fs";
 import * as path from "path";
 
-
 let browser: Browser;
 let context: BrowserContext;
+let testResults: { testName: string; summary: string; status: string; failureReason?: string }[] = [];
+let testPass = 0;
+let testFail = 0;
 
 BeforeAll(async () => {
-  console.log("Launch Browser before tests...");
+  console.log("Launching browser before tests...");
   browser = await chromium.launch({ headless: false });
 });
 
 AfterAll(async () => {
-  console.log("Closing Browser after tests...");
-  await browser.close();
+  console.log("Closing browser after tests...");
+
+  // Get browser version
+  const browserVersion = browser.version();
+
+  // Generate HTML Table
+  const htmlTable = generateHtmlReport(testPass, testFail, testResults, browserVersion);
 
   // Prepare attachments
   const reportPaths = [
@@ -31,8 +38,10 @@ AfterAll(async () => {
       path: report,
     }));
 
-  // Send email with reports
-  await sendEmail("Automation Test Report", "Please find the attached test report.", attachments);
+  // Send Email with Table
+  await sendEmail("Automation Test Report", htmlTable, attachments);
+
+  await browser.close();
 });
 
 Before(async () => {
@@ -45,14 +54,145 @@ Before(async () => {
 After(async ({ pickle, result }) => {
   console.log("Cleaning up after scenario...");
 
-  // Take screenshot if test failed
+  const testName = pickle.name;
+  const status = result?.status == Status.PASSED ? "Pass" : "Fail";
+
+  let failureReason = ""; // Initialize failure reason
+
+  if (status === "Pass") {
+    testPass++;
+  } else {
+    testFail++;
+    failureReason = result?.message || "No specific failure message."; // Capture failure reason
+  }
+
+  testResults.push({
+    testName: testName,
+    summary: `Verify ${testName.replace(/_/g, " ")}`,
+    status: status,
+    failureReason: failureReason, // Now this will work!
+  });
+
+  // Take a screenshot if test failed
   if (result?.status == Status.FAILED) {
     await pageFixture.page.screenshot({
       path: `./test-results/screenshots/${pickle.name}.png`,
-      type: 'png',
+      type: "png",
     });
   }
 
   await pageFixture.page.close();
   await context.close();
 });
+
+
+/**
+ * Generates an HTML table for the test execution summary.
+ */
+function generateHtmlReport(passed: number, failed: number, results: any[], browserVersion: string): string {
+  const failedTests = results.filter(test => test.status === "Fail"); // Extract only failed tests
+
+  return `
+    <html>
+    <head>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          font-size: 14px;
+        }
+        table {
+          width: 80%;
+          border-collapse: collapse;
+          margin: 20px 0;
+        }
+        th, td {
+          border: 1px solid #ccc;
+          padding: 8px;
+          text-align: left; /* Left-aligned text */
+        }
+        th {
+          background-color: #2C3E50;
+          color: white;
+          font-weight: bold;
+        }
+        td {
+          background-color: #f9f9f9;
+        }
+        .summary-table th, .summary-table td {
+          text-align: left; /* Ensure summary content is left-aligned */
+          padding: 10px;
+        }
+        .green {
+          background-color: #D4EDDA;
+          color: #155724;
+          font-weight: bold;
+        }
+        .red {
+          background-color: #F8D7DA;
+          color: #721C24;
+          font-weight: bold;
+        }
+      .failed-testcases {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+      }
+      </style>
+    </head>
+    <body>
+      <h2>Automation Test Execution Report</h2>
+
+      <table class="summary-table">
+        <tr><th><b>Summary</b></th><th><b>Details</b></th></tr>
+        <tr>Project Name<td>SauceDemo</td></tr>
+        <tr>Test Type<td>Automation</td></tr>
+        <tr>Browser Used<td>Chrome</td></tr>
+        <tr>Browser Version<td>${browserVersion}</td></tr>
+        <tr>Test Pass<td>${passed}</td></tr>
+        <tr>Test Fail<td>${failed}</td></tr>
+        <tr>Total Test Cases<td>${passed + failed}</td></tr>
+      </table>
+
+      <h3>Summary Table</h3>
+      <table>
+        <tr>
+          <th>TestCase No.</th>
+          <th>TestCases Summary</th>
+          <th>Results</th>
+        </tr>
+        ${results
+          .map(
+            (test) => `
+          <tr>
+            <td>${test.testName}</td>
+            <td>${test.summary}</td>
+            <td class="${test.status === "Pass" ? "green" : "red"}">${test.status}</td>
+          </tr>`
+          )
+          .join("")}
+      </table>
+
+      <!-- New Failed Test Cases Table -->
+      ${failed > 0 ? `
+      <h3>Failed Test Cases</h3>
+      <table class="failed-testcases">
+        <tr>
+          <th>Test Case ID</th>
+          <th>TestCases Summary</th>
+          <th>Failure Reason</th>
+        </tr>
+        ${failedTests
+          .map(
+            (test) => `
+          <tr>
+            <td>${test.testName}</td>
+            <td>${test.summary}</td>
+            <td>${test.failureReason}</td>
+          </tr>`
+          )
+          .join("")}
+      </table>` : ""}
+    </body>
+    </html>
+  `;
+}
