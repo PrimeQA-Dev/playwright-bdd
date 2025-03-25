@@ -1,9 +1,12 @@
 import * as nodemailer from "nodemailer";
 
-export async function sendEmail(subject: string, body: string, attachments: any[] = []) {
+/**
+ * Sends an email with the test execution report.
+ */
+export async function sendEmail(subject: string, htmlBody: string, attachments: any[] = []) {
     const SENDER_EMAIL = "automationreport477@gmail.com";
     const SENDER_PASSWORD = "jepgjwtiwkdblajf";
-    const RECEIVER_EMAIL = "test@gmail.com";
+    const RECEIVER_EMAIL = "shahyogesh0902@gmail.com";
 
     const transporter = nodemailer.createTransport({
         service: "gmail",
@@ -13,12 +16,12 @@ export async function sendEmail(subject: string, body: string, attachments: any[
         },
     });
 
-    const mailOptions: any = {
+    const mailOptions = {
         from: SENDER_EMAIL,
         to: RECEIVER_EMAIL,
         subject: subject,
-        text: body,
-        attachments: attachments, // Send attachments
+        html: htmlBody, // Send HTML body (report table)
+        attachments: attachments, // Attach report files if available
     };
 
     try {
