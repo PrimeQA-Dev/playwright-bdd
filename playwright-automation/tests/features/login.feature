@@ -15,3 +15,10 @@ Feature: Login
   Examples:
       | page  | 
       | Cart  | 
+
+
+  @smoke
+  Scenario Outline: user successfully logs in to saucelab with valid credentials and verify hamburger menu
+    When user login with "testCredential:username" and "testCredential:password" for register user
+    Then user verify swaglabs home page titles for "<username>" user
+    Then user verify hamburger menu
