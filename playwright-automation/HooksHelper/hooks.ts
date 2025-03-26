@@ -144,54 +144,16 @@ function generateHtmlReport(passed: number, failed: number, results: any[], brow
 
       <table class="summary-table">
         <tr><th><b>Summary</b></th><th><b>Details</b></th></tr>
-        <tr>Project Name<td>SauceDemo</td></tr>
-        <tr>Test Type<td>Automation</td></tr>
-        <tr>Browser Used<td>Chrome</td></tr>
-        <tr>Browser Version<td>${browserVersion}</td></tr>
-        <tr>Test Pass<td>${passed}</td></tr>
-        <tr>Test Fail<td>${failed}</td></tr>
-        <tr>Total Test Cases<td>${passed + failed}</td></tr>
+        <tr><td>Project Name</td><td>SauceDemo</td></tr>
+        <tr><td>Test Type</td><td>Automation</td></tr>
+        <tr><td>Browser Used</td><td>Chrome</td></tr>
+        <tr><td>Browser Version</td><td>${browserVersion}</td></tr>
+        <tr><td>Test Pass</td><td>${passed}</td></tr>
+        <tr><td>Test Fail</td><td>${failed}</td></tr>
+        <tr><td>Total Test Cases</td><td>${passed + failed}</td></tr>
       </table>
 
-      <h3>Summary Table</h3>
-      <table>
-        <tr>
-          <th>TestCase No.</th>
-          <th>TestCases Summary</th>
-          <th>Results</th>
-        </tr>
-        ${results
-          .map(
-            (test) => `
-          <tr>
-            <td>${test.testName}</td>
-            <td>${test.summary}</td>
-            <td class="${test.status === "Pass" ? "green" : "red"}">${test.status}</td>
-          </tr>`
-          )
-          .join("")}
-      </table>
-
-      <!-- New Failed Test Cases Table -->
-      ${failed > 0 ? `
-      <h3>Failed Test Cases</h3>
-      <table class="failed-testcases">
-        <tr>
-          <th>Test Case ID</th>
-          <th>TestCases Summary</th>
-          <th>Failure Reason</th>
-        </tr>
-        ${failedTests
-          .map(
-            (test) => `
-          <tr>
-            <td>${test.testName}</td>
-            <td>${test.summary}</td>
-            <td>${test.failureReason}</td>
-          </tr>`
-          )
-          .join("")}
-      </table>` : ""}
+      
     </body>
     </html>
   `;

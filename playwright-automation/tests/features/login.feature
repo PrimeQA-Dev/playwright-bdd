@@ -4,7 +4,7 @@ Feature: Login
     Given user open the saucelab url 
 
   @smoke
-  Scenario Outline: user successfully logs in to saucelab with valid credentials and verify different pages
+  Scenario: user successfully logs in to saucelab with valid credentials and verify different pages
     When user login with "testCredential:username" and "testCredential:password" for register user
     Then user verify swaglabs home page titles
     Then user tap on "Product" title
