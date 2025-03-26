@@ -16,7 +16,7 @@ export class HomePage {
         private readonly verifyHamburgerMenu = '//div[@class="bm-burger-buttontest"]'
 
 
-    async verifyHomePage(username) {
+    async verifyHomePage() {
         await expect(pageFixture.page.locator(this.verifySiteTitle)).toBeVisible({timeout : TIMEOUT});
         await expect(pageFixture.page.locator(this.verifySideLabel)).toBeVisible({timeout : TIMEOUT});
         await expect(pageFixture.page.locator(this.verifyFilter)).toBeVisible({timeout : TIMEOUT});

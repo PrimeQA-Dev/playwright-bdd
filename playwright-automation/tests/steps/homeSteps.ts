@@ -6,8 +6,8 @@ let homePage = new HomePage(pageFixture.page);
 
 
 
-Then('user verify swaglabs home page titles for {string} user', async function (username) {
-    await homePage.verifyHomePage(username);   
+Then('user verify swaglabs home page titles', async function () {
+    await homePage.verifyHomePage();   
     });
 
 Then('user tap on {string} title', async function (product) {

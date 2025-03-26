@@ -6,7 +6,6 @@
     "test": "tests"
   },
   "scripts": {
-    "pretest": "npx ts-node",
     "test": "cucumber-js test",
     "test:smoke": "cucumber-js test --profile smoke"
   },
@@ -26,7 +25,9 @@
   },
   "dependencies": {
     "cucumber": "^6.0.7",
+    "nodemailer": "^6.10.0",
     "oracledb": "^6.7.1",
+    "playwright": "^1.51.1",
     "playwright-automation": "file:"
   }
 }
